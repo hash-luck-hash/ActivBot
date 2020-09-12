@@ -20,6 +20,7 @@
   "homepage": "https://github.com/hash-luck-hash/ActivBot#readme",
   "dependencies": {
     "discord.js": "^12.3.1",
+    "js-priority-queue": "^0.1.5",
     "node": "^14.8.0",
     "nodemon": "^2.0.4"
   }

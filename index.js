@@ -1,9 +1,18 @@
 const Discord = require('discord.js');
 const config = require('./config.js');
+const PriorityQueue = require('js-priority-queue');
+const { Server } = require('http');
 const client = new Discord.Client();
 
 
+function PriorityQStruct(num,USERidNAME){
+    this.num=num;
+    this.USERidNAME=USERidNAME;
+}
 var UserID = new Map();
+var compareNumbers = function(a, b) { return a.num - b.num; };
+var queue = new PriorityQueue({ comparator: compareNumbers });
+var helpqueue = new  Array();
 /*function mapstruct(){
     this.
 }*/
@@ -13,9 +22,14 @@ var UserID = new Map();
     return userId;
 }*/
 function MessageCount(message){
-    if(UserID.has(message.author.username))
-    {var NewValue = UserID.get(message.author.username); UserID.delete(message.author.username); UserID.set(message.author.username,NewValue+1);}
-    else UserID.set(message.author.username,1);
+    if(UserID.has(message.author.username)){
+    var NewValue = UserID.get(message.author.username);
+         UserID.delete(message.author.username);
+          UserID.set(message.author.username,NewValue+1);}
+    else {
+        UserID.set(message.author.username,1);
+        queue.queue(new PriorityQStruct(-1,message.author.username));//////////////QUEUE
+    }
 }
 function cout(message){
     console.log(UserID.get(message.author.username));
@@ -23,14 +37,39 @@ function cout(message){
 /*function CreateCategory(message){
     message.guild.createChannel("NAME OF THE CHANNEL", "category");
 }*/
+function ReloadQueue(){
+    //if(queue.length>0) console.log(queue.peek());
+    helpqueue.length=0;
+    while(queue.length>0){
+        helpqueue.push(queue.dequeue());
+    }
+    while(helpqueue.length>0){
+        var Elements = helpqueue.pop();
+        queue.queue(new PriorityQStruct(-(UserID.get(Elements.USERidNAME)),
+        Elements.USERidNAME));
+    }
+    helpqueue.length=0;
+}
+function TopQueue(Num){
+   helpqueue.length=0;
+   var helpqueue2 = new Array();
+    var i = 1;
+   while(queue.length>=1&&i<=Num){
+       var Val = queue.dequeue();
+       helpqueue.push(Val);
+       helpqueue2.push(Val);
+   }
+   while(helpqueue2.length>0){
+       queue.queue(helpqueue2.pop());
+   }
+}
 function MakeList(Num,message){
     var i = 1;
-    while(i<=Num){
-        const UserName = message.author.username;
-        //const UserName = client.users.cache.get(ID(message)); 
-        //message.reply(UserName);
-        message.guild.channels.create("#TOP"+ i +" : " + UserName + "(" + UserID.get(UserName)+ ")" ,{type: 'voice'})
-        //.then((channel)=> {});
+    TopQueue(Num);
+    console.log(helpqueue);
+    while(i<=Num&&helpqueue.length>=i){
+        const UserName = helpqueue[i-1].USERidNAME;
+        message.guild.channels.create("#TOP"+ i +" : " + UserName + "(" + UserID.get(UserName)+ ")" ,{type: 'voice'}).then((channel)=> {});
         i++;
     }
 }
@@ -41,8 +80,14 @@ client.on('ready', () => {
   client.user.setActivity('!activitylist <number>',{type: "LISTENING"});
 });
 
+const Reloading = setInterval(() => {    //RELOADING QUEUE
+    ReloadQueue();
+    console.log('Reloading!');
+}, 5000);
+
 
 client.on('message', msg => {
+
     MessageCount(msg);
     cout(msg);
     if(msg.content.startsWith("!activitylist")){
@@ -53,7 +98,7 @@ client.on('message', msg => {
         console.log(args);
         var NUMBER = parseInt(args[1],10);
         if(NUMBER==args[1])    
-        MakeList(NUMBER,msg);
+        MakeList(NUMBER,msg); /////TWORZENIE LISTY
         else msg.reply('You can not create a new Activity List because  ' + args[1] + '  is not a NUMBER!');
     } //else if(){
 
