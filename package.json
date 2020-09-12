@@ -1,0 +1,26 @@
+{
+  "name": "activbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "debug": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hash-luck-hash/ActivBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hash-luck-hash/ActivBot/issues"
+  },
+  "homepage": "https://github.com/hash-luck-hash/ActivBot#readme",
+  "dependencies": {
+    "discord.js": "^12.3.1",
+    "node": "^14.8.0",
+    "nodemon": "^2.0.4"
+  }
+}
