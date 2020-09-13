@@ -86,6 +86,7 @@ function DeleteChannels(){
     if(!MessageID) return;
     for(i = 0;i<ChannelsToDelete.length;i++){
         const fetchedChannel = MessageID.guild.channels.cache.find(r => r.name === ChannelsToDelete[i]);
+        if(!fetchedChannel) return;
         fetchedChannel.delete();
     }
     ChannelsToDelete.length = 0;
