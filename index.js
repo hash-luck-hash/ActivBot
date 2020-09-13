@@ -9,10 +9,13 @@ function PriorityQStruct(num,USERidNAME){
     this.num=num;
     this.USERidNAME=USERidNAME;
 }
+var MessageID;
+var Topmembers = 0;
 var UserID = new Map();
 var compareNumbers = function(a, b) { return a.num - b.num; };
 var queue = new PriorityQueue({ comparator: compareNumbers });
 var helpqueue = new  Array();
+var ChannelsToDelete = new Array();
 /*function mapstruct(){
     this.
 }*/
@@ -37,6 +40,10 @@ function cout(message){
 /*function CreateCategory(message){
     message.guild.createChannel("NAME OF THE CHANNEL", "category");
 }*/
+function NumList(nr,message){
+    Topmembers = nr;
+    MessageID = message;
+}
 function ReloadQueue(){
     //if(queue.length>0) console.log(queue.peek());
     helpqueue.length=0;
@@ -69,19 +76,33 @@ function MakeList(Num,message){
     console.log(helpqueue);
     while(i<=Num&&helpqueue.length>=i){
         const UserName = helpqueue[i-1].USERidNAME;
-        message.guild.channels.create("#TOP"+ i +" : " + UserName + "(" + UserID.get(UserName)+ ")" ,{type: 'voice'}).then((channel)=> {});
+        let Description = "#TOP"+ i +" : " + UserName + "(" + UserID.get(UserName)+ ")";
+        message.guild.channels.create(Description,{type: 'voice'}).then((channel)=> {});
+        ChannelsToDelete.push(Description);
         i++;
     }
 }
-
+function DeleteChannels(){
+    if(!MessageID) return;
+    for(i = 0;i<ChannelsToDelete.length;i++){
+        const fetchedChannel = MessageID.guild.channels.cache.find(r => r.name === ChannelsToDelete[i]);
+        fetchedChannel.delete();
+    }
+    ChannelsToDelete.length = 0;
+}
+function ReloadList(){
+    ReloadQueue();
+    DeleteChannels();
+    MakeList(Topmembers,MessageID);
+}
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity('!activitylist <number>',{type: "LISTENING"});
+  client.user.setActivity('!activitylist <num>',{type: "LISTENING"});
 });
 
-const Reloading = setInterval(() => {    //RELOADING QUEUE
-    ReloadQueue();
+const Reloading = setInterval(() => {    //RELOADING LIST
+    ReloadList();
     console.log('Reloading!');
 }, 5000);
 
@@ -98,7 +119,7 @@ client.on('message', msg => {
         console.log(args);
         var NUMBER = parseInt(args[1],10);
         if(NUMBER==args[1])    
-        MakeList(NUMBER,msg); /////TWORZENIE LISTY
+        NumList(NUMBER,msg); /////TWORZENIE LISTY
         else msg.reply('You can not create a new Activity List because  ' + args[1] + '  is not a NUMBER!');
     } //else if(){
 
