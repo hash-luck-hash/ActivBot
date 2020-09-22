@@ -55,6 +55,7 @@ function ReloadQueue(){
         queue.queue(new PriorityQStruct(-(UserID.get(Elements.USERidNAME)),
         Elements.USERidNAME));
     }
+    //console.log(queue);
     helpqueue.length=0;
 }
 function TopQueue(Num){
@@ -69,15 +70,17 @@ function TopQueue(Num){
    while(helpqueue2.length>0){
        queue.queue(helpqueue2.pop());
    }
+   console.log(helpqueue);
 }
 function MakeList(Num,message){
     var i = 1;
     TopQueue(Num);
-    console.log(helpqueue);
+    //console.log(helpqueue);
     while(i<=Num&&helpqueue.length>=i){
         const UserName = helpqueue[i-1].USERidNAME;
         let Description = "#TOP"+ i +" : " + UserName + "(" + UserID.get(UserName)+ ")";
         message.guild.channels.create(Description,{type: 'voice'}).then((channel)=> {});
+        console.log(Description);
         ChannelsToDelete.push(Description);
         i++;
     }
@@ -121,7 +124,7 @@ client.on('message', msg => {
         var NUMBER = parseInt(args[1],10);
         if(NUMBER==args[1])    
         NumList(NUMBER,msg); /////TWORZENIE LISTY
-        else msg.reply('You can not create a new Activity List because  ' + args[1] + '  is not a NUMBER!');
+        else msg.reply('You can not create a new Activity List because " ' + args[1] + ' " is not a NUMBER!');
     } //else if(){
 
    // }
